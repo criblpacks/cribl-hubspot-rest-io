@@ -1,0 +1,22 @@
+Hubspot:
+  lib: custom
+  minRawLength: 256
+  rules:
+    - condition: "true"
+      type: json_array
+      timestampAnchorRegex: /occurredAt/
+      timestamp:
+        type: auto
+        length: 150
+      timestampTimezone: local
+      timestampEarliest: -420weeks
+      timestampLatest: +1week
+      maxEventBytes: 51200
+      disabled: false
+      parserEnabled: false
+      shouldUseDataRaw: false
+      jsonExtractAll: false
+      eventBreakerRegex: /[\n\r]+(?!\s)/
+      name: Audit Logs
+      jsonArrayField: results
+  description: Event breaking rules for Hubspot events
