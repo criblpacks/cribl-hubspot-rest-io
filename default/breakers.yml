@@ -1,4 +1,4 @@
-Hubspot:
+Hubspot API Ruleset:
   lib: custom
   minRawLength: 256
   rules:

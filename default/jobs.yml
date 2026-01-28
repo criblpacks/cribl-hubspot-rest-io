@@ -91,7 +91,7 @@ in_hubspot_audit:
       disabled: true
     throttleRatePerSec: "0"
     breakerRulesets:
-      - Hubspot
+      - Hubspot API Ruleset
     metadata:
       - name: __logType
         value: "'hubspot'"
