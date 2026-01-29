@@ -1,0 +1,40 @@
+id: default
+groups: {}
+comments:
+  - id: Ztx5OT
+    comment: Matches JSON events coming from Hubspot Collectors
+    index: 0
+  - id: EkqgfV
+    comment: Something went wrong. We shouldn't be here
+    index: 3
+routes:
+  - id: FsGAZJ
+    name: cribl_hubspot_events_audit_logs
+    final: true
+    disabled: false
+    pipeline: cribl_hubspot_audit_logs
+    description: ""
+    enableOutputExpression: false
+    filter: __packsource.includes('cribl-hubspot-rest-io.audit-logs')
+    clones: []
+    output: default
+  - id: AYk4fA
+    name: cribl_hubspot_events_login_activity
+    final: true
+    disabled: false
+    pipeline: cribl_hubspot_login_activity
+    description: ""
+    enableOutputExpression: false
+    filter: __packsource.includes('cribl-hubspot-rest-io.login-activity')
+    clones: []
+    output: default
+  - id: default
+    name: default
+    final: true
+    disabled: false
+    pipeline: main
+    description: ""
+    enableOutputExpression: false
+    filter: "true"
+    clones: []
+    output: default

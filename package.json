@@ -1,0 +1,1 @@
+{"version":"1.0.0","tags":{"streamtags":[],"dataType":["logs"],"useCase":["routing"]},"exports":[],"displayName":"Hubspot REST Collector IO","description":"Collector pack to process data from Hubspot.","author":"Cribl Packs Team","name":"cribl-hubspot-rest-io","minLogStreamVersion":"4.15.0"}

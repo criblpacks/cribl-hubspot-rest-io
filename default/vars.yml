@@ -1,0 +1,13 @@
+hubspot_access_token:
+  type: encryptedString
+  lib: custom
+  value: YOUR_HUBSPOT_ACCESS_TOKEN
+  description: "REQUIRED: Your Hubspot Access Token"
+default_splunk_sourcetype:
+  type: any
+  lib: custom
+  value: "'hubspot:audit'"
+default_splunk_index:
+  type: any
+  lib: custom
+  value: "'hubspot'"
