@@ -17,7 +17,7 @@ functions:
     filter: "true"
     conf:
       comment: |-
-        This conditioning pipeline is for use on the Hubspot REST Events API endpoint. The Pack will normalize the JSON data from the collector and provide optional reduction techniques. 
+        This conditioning pipeline is for use on the Hubspot REST Events Login Activity API endpoint. The Pack will normalize the JSON data from the collector and provide optional reduction techniques. 
 
         There are two current available output formats for the data: 
             1. Standard JSON that is formatted and timestamp normalized. 
@@ -50,19 +50,6 @@ functions:
         - _raw
     description: Remove intermediate fields
     groupId: SbRroP
-  - id: auto_timestamp
-    filter: "true"
-    conf:
-      srcField: occurredAt
-      dstField: _time
-      defaultTimezone: UTC
-      timeExpression: time.getTime() / 1000
-      offset: 0
-      maxLen: 150
-      defaultTime: now
-      latestDateAllowed: +1week
-      earliestDateAllowed: -420weeks
-    groupId: SbRroP
   - id: comment
     filter: "true"
     disabled: false
@@ -92,10 +79,10 @@ functions:
           value: "index ? index : C.vars['default_splunk_index']"
           name: index
         - disabled: false
-          value: "sourcetype ? sourcetype : C.vars['default_splunk_sourcetype']"
+          value: "'hubspot:login_activity'"
           name: sourcetype
         - disabled: false
-          value: C.vars['default_splunk_source']
+          value: source || C.vars['default_splunk_source']
           name: source
       keep:
         - _*

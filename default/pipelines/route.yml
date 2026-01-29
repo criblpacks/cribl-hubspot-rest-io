@@ -6,19 +6,28 @@ comments:
     index: 0
   - id: EkqgfV
     comment: Something went wrong. We shouldn't be here
-    index: 2
+    index: 3
 routes:
   - id: FsGAZJ
-    name: cribl_hubspot_events_all
+    name: cribl_hubspot_events_audit_logs
     final: true
     disabled: false
-    pipeline: cribl_hubspot
-    description: Process Hubspot Logs
+    pipeline: cribl_hubspot_audit_logs
+    description: ""
     enableOutputExpression: false
-    outputExpression: null
-    filter: __packsource.includes('cribl-hubspot-rest-io')
+    filter: __packsource.includes('cribl-hubspot-rest-io.audit-logs')
     clones: []
-    output: out_ians_sandbox
+    output: default
+  - id: AYk4fA
+    name: cribl_hubspot_events_login_activity
+    final: true
+    disabled: false
+    pipeline: cribl_hubspot_login_activity
+    description: ""
+    enableOutputExpression: false
+    filter: __packsource.includes('cribl-hubspot-rest-io.login-activity')
+    clones: []
+    output: default
   - id: default
     name: default
     final: true
@@ -26,7 +35,6 @@ routes:
     pipeline: main
     description: ""
     enableOutputExpression: false
-    outputExpression: null
     filter: "true"
     clones: []
     output: default

@@ -5,7 +5,7 @@ in_hubspot_audit:
   removeFields: []
   resumeOnBoot: false
   schedule:
-    cronSchedule: 2 * * * *
+    cronSchedule: "*/15 * * * *"
     maxConcurrentRuns: 1
     skippable: true
     run:
@@ -25,7 +25,7 @@ in_hubspot_audit:
         stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
           prevState : newState"
         enabled: true
-    enabled: true
+    enabled: false
   streamtags: []
   workerAffinity: false
   collector:
@@ -74,12 +74,15 @@ in_hubspot_audit:
       collectUrl: "'https://api.hubapi.com/account-info/v3/activity/audit-logs'"
       collectRequestParams:
         - name: limit
-          value: "'100'"
+          value: "100"
+        - value: "`${new Date(state.latestTime*1000 ||
+            Date.now()-(60*60*1000*24*7)).toISOString()}`"
+          name: occurredAfter
       collectRequestHeaders:
         - name: authorization
-          value: changeme
+          value: "`Bearer ${C.vars['hubspot_access_token']}`"
         - name: accept
-          value: changeme
+          value: "'application/json'"
     destructive: false
     encoding: utf8
     type: rest
@@ -96,11 +99,115 @@ in_hubspot_audit:
       - name: __logType
         value: "'hubspot'"
       - name: __packsource
-        value: "'cribl-hubspot-rest-io'"
-  savedState:
-    restCollectorState:
-      data:
-        latestTime: 1769173247.657
+        value: "'cribl-hubspot-rest-io.audit-logs'"
+  savedState: {}
   notifications: []
   description: Ingests HubSpot audit and administrative activity events via API
     for security monitoring, compliance, and change tracking.
+in_hubspot_login_activity:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: 4 10 * * *
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 60m
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+        enabled: false
+    enabled: false
+  streamtags: []
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+        discoverMethod: get
+        pagination:
+          type: none
+        enableDiscoverCode: false
+        discoverUrl: "'https://api.hubapi.com/account-info/v3/activity/audit-logs'"
+      collectMethod: get
+      pagination:
+        type: response_body
+        maxPages: 20
+        attribute: paging.next.after
+        parameter: after
+      authentication: none
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: true
+      decodeUrl: false
+      rejectUnauthorized: true
+      captureHeaders: false
+      stopOnEmptyResults: false
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      __scheduling:
+        stateTracking: {}
+      loginUrl: ""
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      clientSecretParamName: client_secret
+      collectUrl: "'https://api.hubapi.com/account-info/v3/activity/login'"
+      collectRequestParams:
+        - name: limit
+          value: "100"
+        - value: "`${new Date(state.latestTime*1000 ||
+            Date.now()-(60*60*1000*24*7)).toISOString()}`"
+          name: occurredBefore
+      collectRequestHeaders:
+        - name: authorization
+          value: "`Bearer ${C.vars['hubspot_access_token']}`"
+        - name: accept
+          value: "'application/json'"
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - Hubspot API Ruleset
+    metadata:
+      - name: __logType
+        value: "'hubspot'"
+      - name: __packsource
+        value: "'cribl-hubspot-rest-io.login-activity'"
+  savedState: {}
+  notifications: []
+  description: "Ingests HubSpot Login Activity. NOTE: this endpoint has no way to
+    limit what data is ingested by time, so it just grabs the last 2000 records
+    by default."

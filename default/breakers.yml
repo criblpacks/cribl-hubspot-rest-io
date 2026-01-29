@@ -2,7 +2,7 @@ Hubspot API Ruleset:
   lib: custom
   minRawLength: 256
   rules:
-    - condition: "true"
+    - condition: _raw.includes('occurredAt')
       type: json_array
       timestampAnchorRegex: /occurredAt/
       timestamp:
@@ -19,4 +19,21 @@ Hubspot API Ruleset:
       eventBreakerRegex: /[\n\r]+(?!\s)/
       name: Audit Logs
       jsonArrayField: results
+    - condition: _raw.includes('loginAt')
+      type: json_array
+      timestampAnchorRegex: /loginAt/
+      timestamp:
+        type: auto
+        length: 150
+      timestampTimezone: local
+      timestampEarliest: -420weeks
+      timestampLatest: +1week
+      maxEventBytes: 51200
+      disabled: false
+      parserEnabled: false
+      shouldUseDataRaw: false
+      jsonExtractAll: false
+      eventBreakerRegex: /[\n\r]+(?!\s)/
+      jsonArrayField: results
+      name: Login Activity
   description: Event breaking rules for Hubspot events
