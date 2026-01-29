@@ -75,7 +75,7 @@ in_hubspot_audit:
       collectRequestParams:
         - name: limit
           value: "100"
-        - value: "`${new Date(state.latestTime*1000 ||
+        - value: "`${new Date(state.latestTime*1000 + 1 ||
             Date.now()-(60*60*1000*24*7)).toISOString()}`"
           name: occurredAfter
       collectRequestHeaders:

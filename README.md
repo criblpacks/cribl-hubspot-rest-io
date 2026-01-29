@@ -1,60 +1,46 @@
-# Pack Name
-Cribl HubSpot Rest Collector
-
+# Hubspot REST Collector IO
+----
 ## About this Pack
 
-This Pack is designed to collect, process, and output HubSpot audit log data via the [HubSpot Account Activity API](https://developers.hubspot.com/docs/api/settings/account-activity-api).
+This pack is built as a complete SOURCE + DESTINATION solution (identified by the IO suffix). Data collection and delivery happen entirely within the pack's context, eliminating the need to connect it to globally defined Sources and Destinations. 
 
-The Pack includes Splunk output processing that maps data to a Splunk-compatible format for security monitoring and compliance use cases.
+This Pack is designed to collect, process, and output HubSpot audit log and login activity data via the [HubSpot Account Activity API](https://developers.hubspot.com/docs/api/settings/account-activity-api).
+
+The Pack includes optional Splunk output processing that maps data to a Splunk-compatible format for security monitoring and compliance use cases.
 
 ## Deployment
 
-After installing the Pack, you must perform the following:
+* This pack is configured by default to use the Worker Group's *Default Destination*.
+* To use the *Default Destination*: No changes are required. The pack will route the data to the destination currently set as the Default on the Worker Group.
+* To use a different Destination: You must update the pack's routes to specify your desired Destination.
+* For immediate functionality without requiring Pack route filter expression modifications, every bundled Source within this pack adds a hidden field: `__packsource`. This field allows for seamless routing based on the Pack source.
 
-### Add HubSpot Credentials to Cribl Stream
-*Note*: If you use an external secret store, the authentication function will have to be modified to reference those secrets using the proper names.
+### Configure the Collectors
 
 * Obtain a **Private App Access Token** from your HubSpot account.
   * Navigate to **Settings > Integrations > Private Apps** in HubSpot
-  * Create a new Private App with the required scopes for audit log access
-* Open the worker group that will contain the HubSpot collector.
-* Navigate to **Worker Group Settings > Security > Secrets**
-* Create 1 Secret:
-   * Name: `hubspot-access-token`, of secret type **text**, containing the **Private App Access Token**.
+  * Create a new Private App with the required scopes for audit log access (minimum of `account-info.security.read`)
+* Update the `hubspot_access_token` variable with your Access Token
+* Perform a **Commit & Deploy** (required for Preview to work) and then **Run > Preview** of each Collector to verify that they work correctly.
+* Schedule the Collectors, adjusting the schedule as needed. Collectors requiring State Tracking already have it enabled.
 
-### Update and Enable the Collector
+**NOTE**: the `in_hubspot_login_activity` Collector will collect as much login activity as it can because the endpoint does not accept a filter. By default, it will only collect the last 2000 entries (combination of `limit` and `page limit`) and run once/day. Adjust based on your Hubspot usage activity. 
 
-* Navigate to **Sources > Collectors > REST** within the HubSpot pack. There is 1 collector available:
-   * in_hubspot_audit: This API collects [Account Activity / Audit Logs](https://developers.hubspot.com/docs/api/settings/account-activity-api) including login events, security events, and user activity.
+### Configure Output Format
 
-* The base API URL is pre-configured as `https://api.hubapi.com`.
-* Perform a Run > Preview to verify that the Collector works correctly.
-* To schedule data ingestion, click the **Schedule** button under the Actions column of the Collector and toggle the **Enabled** button to enable data flow. Modify the cron schedule if required; the default is set to run the Collector every 5 minutes. Confirm the **State tracking** parameter is enabled.
+Each data type can be configured to output data in either normalized JSON or Splunk (`_raw` + Splunk fields) format. Enable *only one* format for each pipeline.
 
-### Required HubSpot Scopes
+### Configure your Destination/Update Pack Routes
+To ensure proper data routing, you must make a choice: retain the current setting to use the Default Destination defined by your Worker Group, or define a new Destination directly inside this pack and adjust the pack's route accordingly.
 
-Ensure your Private App has the following scope enabled:
-
-| Collector | Required Scopes |
-|-----------|----------------|
-| in_hubspot_audit | `account-info.security.read` |
-
-### Outputs
-
-### Update and Validate the Splunk Destination
-
-* Create a [HEC token in Splunk](https://help.splunk.com/en/splunk-enterprise/get-started/get-data-in/10.0/get-data-with-http-event-collector/set-up-and-use-http-event-collector-in-splunk-web).
-* Populate the **Splunk HEC Endpoints** parameter with the Splunk HEC URL.
-* Populate the **HEC Auth token** with the token created in Splunk.
-
-## Pack Configurable Items 
-The following are the in-Pack configurable items - review/update them as needed. 
+### Commit and Deploy
+Once everything is configured, perform a **Commit & Deploy** to enable data collection.
 
 ### Variables
 
 The Pack has the following variables:
+* `hubspot_access_token`: Your Hubspot Access Token
 * `default_splunk_index`: Default index for the Splunk output - defaults to `hubspot`.
-* `default_splunk_source`: Default source for the Splunk output - defaults to `hubspot:api`.
 * `default_splunk_sourcetype`: Default sourcetype for the Splunk output - defaults to `hubspot:audit`.
 
 ## Upgrades
@@ -65,12 +51,9 @@ When upgrading, review any custom modifications made to Pipelines or Functions, 
 
 ## Release Notes
 
-### Version 0.0.1 - 2026-01-21
+### Version 1.0.0
 
-Initial release:
-* Added collector for HubSpot Account Activity / Audit Logs
-* Splunk HEC output with field mappings
-* State tracking for incremental data collection
+- Initial release:
 
 ## Contributing to the Pack
  
