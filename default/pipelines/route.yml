@@ -17,7 +17,8 @@ routes:
     enableOutputExpression: false
     filter: __packsource.includes('cribl-hubspot-rest-io.audit-logs')
     clones: []
-    output: default
+    targetContext: group
+    output: __group
   - id: AYk4fA
     name: cribl_hubspot_events_login_activity
     final: true
@@ -27,7 +28,8 @@ routes:
     enableOutputExpression: false
     filter: __packsource.includes('cribl-hubspot-rest-io.login-activity')
     clones: []
-    output: default
+    targetContext: group
+    output: __group
   - id: default
     name: default
     final: true
@@ -37,4 +39,5 @@ routes:
     enableOutputExpression: false
     filter: "true"
     clones: []
-    output: default
+    targetContext: group
+    output: __group
